@@ -1,10 +1,14 @@
-﻿using Business.Abstract;
+﻿using AutoMapper;
+using Business.Abstract;
 using DataAccess.Concrete.EntityFramework;
 using Entity.Concrete;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using WepAPI.CustomerOperations;
 using WepAPI.CustomersOperations;
 using static WepAPI.CustomerOperations.CreateCustomerCommand;
+using static WepAPI.CustomerOperations.UpdateCustomerCommand;
 
 namespace WepAPI.Controllers
 {
@@ -14,21 +18,50 @@ namespace WepAPI.Controllers
     {
         private readonly ICustomerService _customerService;
         private readonly RentCarContext _rentCarContext;
+        private readonly IMapper _mapper;
 
-       
 
-        public CustomerController(ICustomerService customerService ,RentCarContext rentCarContext)
+
+        public CustomerController(ICustomerService customerService, RentCarContext rentCarContext, IMapper mapper)
         {
             _customerService = customerService;
             _rentCarContext = rentCarContext;
+            _mapper = mapper;
         }
         [HttpPost("add")]
         public IActionResult Add(CreateCustomerModel createCustomerModel)
         {
-            CreateCustomerCommand createCustomer = new CreateCustomerCommand(_rentCarContext);
-            createCustomer.Model = createCustomerModel;
-            createCustomer.Handle();
+            CreateCustomerCommand createCustomer = new CreateCustomerCommand(_rentCarContext, _mapper);
+            try
+            {
+                createCustomer.Model = createCustomerModel;
+                CreateCustomerCommandValidator validator = new CreateCustomerCommandValidator();
+                validator.ValidateAndThrow(createCustomer);
+                createCustomer.Handle();
+
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
             return Ok();
+            //if (!result.IsValid)
+            //{
+            //    foreach (var item in result.Errors)
+            //    {
+            //        System.Console.WriteLine();
+            //        return BadRequest("Property " + item.PropertyName + " Error Message : " + item.ErrorMessage);
+
+
+            //    }
+            //    return BadRequest("olmadı");
+            //}
+            //else
+            //{
+            //    createCustomer.Handle();
+            //    return Ok();
+
+            //}
 
             //var result = _customerService.Add(customer);
             //if (result.Success)
@@ -40,39 +73,53 @@ namespace WepAPI.Controllers
         [HttpGet("getall")]
         public IActionResult GetAll()
         {
-            GetCustomersQuery query = new GetCustomersQuery(_rentCarContext);
+            GetCustomersQuery query = new GetCustomersQuery(_rentCarContext, _mapper);
             var result = query.Handle();
             return Ok(result);
         }
         [HttpGet("get")]
         public IActionResult Get(int id)
         {
-            var result = _customerService.Get(id);
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+
+            GetCustomerQuery query = new GetCustomerQuery(_rentCarContext, _mapper);
+            query.UserId = id;
+            var result = query.Handle();
+            return Ok(result);
         }
         [HttpDelete("delete")]
-        public IActionResult Delete(Customer customer)
+        public IActionResult Delete(int id)//bu tamam
         {
-            var result = _customerService.Delete(customer);
-            if (result.Success)
+            try
             {
-                return Ok(result);
+                DeleteCustomerCommand command = new DeleteCustomerCommand(_rentCarContext);
+                command.CustomerId = id;
+                DeleteCustomerCommandValidator validator = new DeleteCustomerCommandValidator();
+                validator.ValidateAndThrow(command);
+                command.Handle();
+
             }
-            return BadRequest(result);
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok();
         }
         [HttpPost("update")]
-        public IActionResult Update(Customer customer)
+        public IActionResult Update(int id, UpdateCustomerModel updateCustomerModel)//bunu yapamadım 
         {
-            var result = _customerService.Update(customer);
-            if (result.Success)
+            try
             {
-                return Ok(result);
+                UpdateCustomerCommand command = new UpdateCustomerCommand(_rentCarContext);
+                command.CustomerId = id;
+                command.Model = updateCustomerModel;
+                command.Handle();
             }
-            return BadRequest(result);
+            catch (System.Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+            return Ok();
         }
     }
 }

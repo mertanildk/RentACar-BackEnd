@@ -1,39 +1,33 @@
-﻿using Business.Common;
+﻿using AutoMapper;
 using DataAccess.Concrete.EntityFramework;
 using Entity.Concrete;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WepAPI.CustomersOperations
-
+namespace WepAPI.CustomerOperations
 {
     public class GetCustomersQuery
     {
         private readonly RentCarContext _rentCarContext;
-
-        public GetCustomersQuery(RentCarContext rentCarContext)
+        private readonly IMapper _mapper;
+        public GetCustomersQuery(RentCarContext rentCarContext, IMapper mapper)
         {
             _rentCarContext = rentCarContext;
+            _mapper = mapper;
         }
-        public List<CustomerViewModel> Handle()
+        public List<CustomersViewModel> Handle()
         {
-            var customerList = _rentCarContext.Customers.OrderBy(x => x.Id).ToList<Customer>();
-            List<CustomerViewModel> customerViewModels= new List<CustomerViewModel>();
-            foreach (var customer in customerList)
-            {
-                customerViewModels.Add(new CustomerViewModel()
-                {
-                    CompanyName = customer.CompanyName,
-                    UserName = ((UserEnum)customer.UserId).ToString(),
+            var CustomersList = _rentCarContext.Customers.OrderBy(x => x.Id).ToList<Customer>();
+            List<CustomersViewModel> customers = _mapper.Map<List<CustomersViewModel>>(CustomersList);
 
-                }) ;
-            }
-            return customerViewModels;
+            return customers;
         }
-        public class CustomerViewModel
+
+        public class CustomersViewModel
         {
             public string UserName { get; set; }
             public string CompanyName { get; set; }
         }
+
     }
 }

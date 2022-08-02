@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business.Common
+namespace WepAPI.Common
 {
     public enum UserEnum
     {
-        Anil, Mert, Sevval,Cafer
+        Anil, Mert, Sevval,Cafer,Enes,Kiris
     }
 }
