@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.Concrete
+namespace Entity.DTOs
 {
-    public class Color:IEntity
+    public class UserForLoginDto:IDto
     {
-        public int Id { get; set; }
-        public string ColorName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

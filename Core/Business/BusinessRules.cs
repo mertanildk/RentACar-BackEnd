@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Busines
+namespace Core.Business
 {
     public static class BusinessRules
     {

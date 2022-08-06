@@ -104,13 +104,15 @@ namespace WepAPI.Controllers
             }
             return Ok();
         }
-        [HttpPost("update")]
+        [HttpPut("update")]
         public IActionResult Update(int id, UpdateCustomerModel updateCustomerModel)//bunu yapamadım 
         {
             try
             {
                 UpdateCustomerCommand command = new UpdateCustomerCommand(_rentCarContext);
                 command.CustomerId = id;
+                UpdateCustomerCommandValidator validator = new UpdateCustomerCommandValidator();
+                validator.ValidateAndThrow(command);
                 command.Model = updateCustomerModel;
                 command.Handle();
             }

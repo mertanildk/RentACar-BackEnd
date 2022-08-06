@@ -1,6 +1,6 @@
 ﻿using Business.Abstract;
 using Business.Constants;
-using Core.Busines;
+using Core.Business;
 using Core.Utilities.Helper;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
